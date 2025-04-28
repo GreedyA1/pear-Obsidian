@@ -2,6 +2,9 @@
 
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { html } from "htm/react";
+
+import Hypercore from "hypercore";
+import crypto from "hypercore-crypto";
 import { createRoot } from "react-dom/client";
 import App from "./src/containers/App";
 import { PeersProvider } from "./src/context/peers";
@@ -14,6 +17,11 @@ const theme = createTheme({
   },
 });
 
+const topic = crypto.randomBytes(32);
+const core = new Hypercore("./core");
+await core.ready();
+console.log(core.discoveryKey);
+
 const root = createRoot(document.querySelector("#root"));
 root.render(html`
   <${ThemeProvider} theme=${theme}>
@@ -21,10 +29,7 @@ root.render(html`
     <${UserProvider} config=${Pear.config}>
       <${PeersProvider}
         name="pear-obsidian"
-        topic=${
-          app.key ||
-          "57337a386673415371314f315a6d386f504576774259624e32446a7377393752"
-        }
+        topic=${core.discoveryKey}
       >
         <${App} app="{app}" />
       </${PeersProvider}>
